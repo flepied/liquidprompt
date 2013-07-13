@@ -7,7 +7,8 @@ print_ok()
     local RAZ="\\033[0;39m"
     local cols=$1
     local name=$2
-    printf "\e${OK}%-${cols}s %-${cols}s\n${RAZ}" "$name" "OK"
+    # printf "\e${OK}%-${cols}s %-${cols}s\n${RAZ}" "$name" "OK"
+    printf "${OK}%-${cols}s %-${cols}s\n${RAZ}" "$name" "OK"
 }
 
 print_no()
@@ -18,7 +19,8 @@ print_no()
     local name=$2
     local sub=$3
     local line=$4
-    printf "\e${NOK}%-${cols}s %-${cols}s #%-5s\n${RAZ}" "$name" "$sub" "$line"
+    # printf "\e${NOK}%-${cols}s %-${cols}s #%-5s\n${RAZ}" "$name" "$sub" "$line"
+    printf "${NOK}%-${cols}s %-${cols}s #%-5s\n${RAZ}" "$name" "$sub" "$line"
 }
 
 assert()
@@ -160,6 +162,7 @@ export LP_MARK_BATTERY="BATT"
 export LP_MARK_LOAD="LOAD"
 export LP_MARK_UNTRACKED="untracked"
 export LP_MARK_GIT="gitmark"
+export LP_USER_ALWAYS=1
 
 
 # Force erroneous command
@@ -181,6 +184,11 @@ assert_has Battery_Level    55%    $LINENO
 assert_has Load_Mark        LOAD    $LINENO
 assert_has Load_Level       32%    $LINENO
 assert_has User             "[\\\u"    $LINENO
+if [[ $LP_HOSTNAME_ALWAYS == 0 ]] ; then
+    assert_not Hostname     "\\\h"    $LINENO
+else
+    assert_has Hostname     "\\\h"    $LINENO
+fi
 assert_has Perms            :    $LINENO
 assert_has Path             $(pwd | sed -e "s|$HOME|~|")    $LINENO
 assert_has Proxy            proxy    $LINENO
@@ -282,7 +290,7 @@ _lp_set_prompt
 log_prompt
 assert_has Path       "$(pwd | sed -e "s|$HOME|~|")"    $LINENO
 
-echo "NO SHORTEN PATH"
+echo "ENABLE SHORTEN PATH"
 export LP_ENABLE_SHORTEN_PATH=1
 export LP_PATH_LENGTH=35
 export LP_PATH_KEEP=1
@@ -294,10 +302,17 @@ assert_has Short_Path       " … "    $LINENO
 cd $current
 
 echo "LOCAL HOST NAME"
-export LP_HOSTNAME_ALWAYS=1
 _lp_set_prompt
 log_prompt
-assert_has Hostname $(hostname)    $LINENO
+# As the hostname is set once at the script start,
+# and not re-interpret at each prompt,
+# we cannot export the option in the test script.
+# We thus rely on the existing config.
+if [[ $LP_HOSTNAME_ALWAYS == 0 ]] ; then
+    assert_not Hostname     "\\\h"    $LINENO
+else
+    assert_has Hostname     "\\\h"    $LINENO
+fi
 
 echo "prompt_OFF"
 prompt_OFF
@@ -306,9 +321,11 @@ assert_is Prompt            "$ "    $LINENO
 
 echo "prompt_on"
 prompt_on
+export LP_USER_ALWAYS=1
 log_prompt
-assert_has User             "[\\\u"    $LINENO
+assert_has User             "\\\u"    $LINENO
 assert_has Perms            :    $LINENO
 assert_has Path             $(pwd | sed -e "s|$HOME|~|")    $LINENO
+# assert_has Path             "\\\w"    $LINENO
 assert_has Prompt           "$ "    $LINENO
 

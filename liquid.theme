@@ -13,22 +13,33 @@ if [[ "$(locale -k LC_CTYPE | sed -n 's/^charmap="\(.*\)"/\1/p')" == *"UTF-8"* ]
     LP_MARK_BATTERY="⌁"     # in front of the battery charge
     LP_MARK_ADAPTER="⏚"     # displayed when plugged
     LP_MARK_LOAD="⌂"        # in front of the load
+    LP_MARK_TEMP="θ"        # in front of the temp
     LP_MARK_PROXY="↥"       # indicate a proxy in use
     LP_MARK_HG="☿"   # prompt mark in hg repositories
     LP_MARK_SVN="‡"  # prompt mark in svn repositories
     LP_MARK_GIT="±"         # prompt mark in git repositories
+    LP_MARK_FOSSIL="⌘"         # prompt mark in fossil repositories
     LP_MARK_UNTRACKED="*"        # if git has untracked files
+    LP_MARK_STASH="+"        # if git has stashs
+    LP_MARK_SHORTEN_PATH="…" # prompt mark in shortened paths
 else
     # If charset is anything else, fallback to ASCII chars
     LP_MARK_BATTERY="b"
     LP_MARK_ADAPTER="p"
     LP_MARK_LOAD="c"
+    LP_MARK_TEMP="T"
     LP_MARK_PROXY="^"
     LP_MARK_HG="m"
     LP_MARK_SVN="="
     LP_MARK_GIT="+"
+    LP_MARK_FOSSIL="f"
     LP_MARK_UNTRACKED="*"
+    LP_MARK_STASH="+"
+    LP_MARK_SHORTEN_PATH="..."
 fi
+
+# Do not prefix the prompt
+LP_PS1_PREFIX=""
 
 # Colors
 # Available colors are:
@@ -38,7 +49,7 @@ fi
 # Set to a null string "" if you do not want color.
 
 # Current working directory
-LP_COLOR_PATH="$BOLD_WHITE"         # as normal user
+LP_COLOR_PATH="$BOLD"         # as normal user
 LP_COLOR_PATH_ROOT="$BOLD_YELLOW"   # as root
 
 # Color of the proxy mark
@@ -53,7 +64,7 @@ LP_COLOR_JOB_Z="$BOLD_YELLOW"   # Sleeping (Ctrl-Z)
 LP_COLOR_ERR="$PURPLE"
 
 # Prompt mark
-LP_COLOR_MARK="$BOLD_WHITE"     # as user
+LP_COLOR_MARK="$BOLD"     # as user
 LP_COLOR_MARK_ROOT="$BOLD_RED"  # as root
 
 # Current user
@@ -63,8 +74,10 @@ LP_COLOR_USER_ROOT="$BOLD_YELLOW" # root
 
 # Hostname
 LP_COLOR_HOST=""             # local host
-LP_COLOR_SSH="$BOLD_CYAN"    # connected via SSH
+LP_COLOR_SSH="$BLUE"    # connected via SSH
 LP_COLOR_TELNET="$WARN_RED"  # connected via telnet
+LP_COLOR_X11_ON="$GREEN"         # connected with X11 support
+LP_COLOR_X11_OFF="$YELLOW"       # connected without X11 support
 
 # Separation mark (aka permiison in the working dir)
 LP_COLOR_WRITE="$GREEN"  # have write permission
@@ -84,6 +97,9 @@ LP_COLOR_DISCHARGING_UNDER="$RED"     # discharging and under threshold
 
 # Time
 LP_COLOR_TIME="$BLUE"
+
+# Virtualenv
+LP_COLOR_VIRTUALENV="$CYAN"
 
 # Color maps (battery and load levels)
 # Range from 0 (nothing special) to 9 (alert)
